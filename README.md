@@ -1,34 +1,39 @@
-# Real‑Time IIoT Monitoring Platform
+# Real-Time IIoT Monitoring Platform
 
-This README provides **exact, step‑by-step instructions** for Windsurf to build, test, and deploy the Real‑Time IIoT Monitoring Platform. All placeholders (enclosed in `<ANGLE_BRACKETS>`) must be left blank for the project owner to fill in.
+## Live Example
+
+You can view a live demo of this IIoT Monitoring Platform here:
+[http://ec2-18-118-19-19.us-east-2.compute.amazonaws.com:3001](http://ec2-18-118-19-19.us-east-2.compute.amazonaws.com:3001)
+
+## Purpose
+
+This project demonstrates a complete Industrial Internet of Things (IIoT) monitoring solution that simulates real-world industrial sensor data collection, processing, storage, and visualization. It serves as both a learning platform and a starting point for actual IIoT implementations.
+
+The system aims to replicate common IIoT scenarios where:
+- Multiple sensors continuously transmit data from industrial equipment
+- Data is collected via lightweight MQTT protocol (standard for IIoT applications)
+- Time-series data is stored in a specialized database (InfluxDB)
+- Real-time monitoring dashboards allow operators to view equipment status
+
+## Key Features
+
+- **Real-world Simulation**: Generates realistic sensor data patterns that mimic actual industrial equipment
+- **Complete Architecture**: Demonstrates end-to-end IIoT data flow from sensors to dashboard
+- **Containerized Deployment**: Easy deployment via Docker for both development and production
+- **Scalable Design**: Components can be scaled to handle additional sensors and data volume
+- **Real-time Visualization**: Live-updating dashboard for monitoring equipment status
 
 ---
-## Table of Contents
-1. [Overview](#overview)
-2. [Prerequisites](#prerequisites)
-3. [Project Structure](#project-structure)
-4. [Setup Local Development](#setup-local-development)
-   - [1. Initialize Git Repository](#1-initialize-git-repository)
-   - [2. Create `.env.sample`](#2-create-envsample)
-   - [3. Build Simulator Module](#3-build-simulator-module)
-   - [4. Build Backend Module](#4-build-backend-module)
-   - [5. Build Frontend Module](#5-build-frontend-module)
-   - [6. Configure Nginx](#6-configure-nginx)
-   - [7. Create `docker-compose.yml`](#7-create-docker-composeyml)
-5. [Local Testing](#local-testing)
-6. [Deploy to AWS EC2](#deploy-to-aws-ec2)
-   - [1. Clone Repo on Instance](#1-clone-repo-on-instance)
-   - [2. Populate `.env`](#2-populate-env)
-   - [3. Install Docker & Compose](#3-install-docker--compose)
-   - [4. Start Stack](#4-start-stack)
-7. [Placeholders to Fill](#placeholders-to-fill)
+## System Architecture
 
----
-## Overview
-A self‑contained full‑stack platform that:
-- **Simulates** IIoT sensors publishing JSON over MQTT.
-- **Ingests** data in a Java Spring Boot service and writes to InfluxDB.
-- **Visualizes** in a React dashboard via Nginx reverse proxy with SSL.
+The platform consists of these core components:
+
+- **Simulator Module**: Java application that simulates sensors publishing JSON data over MQTT
+- **Backend Module**: Spring Boot service that ingests MQTT data and writes to InfluxDB
+- **Frontend Module**: React dashboard that visualizes sensor data with real-time charts
+- **MQTT Broker**: Message broker for reliable sensor data transmission
+- **InfluxDB**: Time-series database optimized for sensor data storage
+- **Nginx**: Reverse proxy to route traffic and enable secure connections
 
 ## Prerequisites
 - **Local machine**: Java 11+, Maven/Gradle; Node.js 16+ with npm or Yarn; Git; Docker & Docker Compose plugin.
@@ -225,12 +230,42 @@ Verify:
 - Browse `https://${DOMAIN}`
 
 ---
-## Placeholders to Fill
-- `<GIT_REPO_URL>` in clone commands
-- `.env`:
-  - `INFLUXDB_ADMIN_PASSWORD=` (your InfluxDB admin password)
-  - `DOMAIN=` (e.g., iiot.example.com)
-- SSH key path `<PATH_TO_KEY>.pem` and `<ELASTIC_IP>` when SSH’ing
+## Configuration and Credentials
+
+### Setting Up Your Environment
+
+This project uses environment variables for configuration. To get started:
+
+1. Copy the sample environment file to create your own configuration:
+   ```bash
+   cp .env.sample .env
+   ```
+
+2. Edit the `.env` file and set the following values:
+   ```
+   INFLUXDB_ADMIN_USER=admin       # Username for InfluxDB authentication
+   INFLUXDB_ADMIN_PASSWORD=yourpass # Strong password for InfluxDB
+   MQTT_BROKER_URL=mqtt://mqtt:1883 # MQTT broker connection URL (default works for Docker setup)
+   DOMAIN=your-server-ip-or-domain   # Your server's IP address or domain name
+   ```
+
+### For Cloud Deployment
+
+When deploying to a cloud server such as AWS EC2:
+
+1. Update the `DOMAIN` in your `.env` file to match your server's public IP address or domain name
+2. Configure your server's security group to allow traffic on ports:
+   - 80/443 (HTTP/HTTPS)
+   - 1883 (MQTT)
+   - 8081 (Backend API)
+   - 3001 (Frontend)
+   - 8086 (InfluxDB management)
+
+3. For a production environment, consider:
+   - Using stronger passwords
+   - Implementing MQTT authentication
+   - Setting up SSL for secure MQTT connections
+   - Adding monitoring for system health
 
 ---
 *End of README*
