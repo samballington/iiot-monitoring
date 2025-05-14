@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  simulator:
+    build: ./simulator
+    env_file: .env
+    depends_on: ['mqtt']
+
+  mqtt:
+    image: eclipse-mosquitto
+    ports: ['1883:1883']
+    volumes:
+      - ./mqtt/config:/mosquitto/config
+
+  influxdb:
+    image: influxdb:2.0
+    ports: ['8086:8086']
+    env_file: .env
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${INFLUXDB_ADMIN_USER}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${INFLUXDB_ADMIN_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ORG=iiot
+      - DOCKER_INFLUXDB_INIT_BUCKET=sensors
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUXDB_ADMIN_USER}:${INFLUXDB_ADMIN_PASSWORD}
+
+  backend:
+    build: ./backend
+    ports: ['8081:8080']
+    env_file: .env
+    depends_on: ['mqtt','influxdb']
+
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports: ['3001:3000']
+    depends_on: ['backend']
+
+  nginx:
+    image: nginx:stable
+    ports: ['80:80','443:443']
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt
+    depends_on: ['backend','frontend']

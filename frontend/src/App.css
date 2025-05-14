@@ -1,0 +1,58 @@
+.App {
+  text-align: center;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: 30px;
+}
+
+.dashboard-title {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.dashboard-subtitle {
+  color: #666;
+  font-weight: normal;
+}
+
+.sensor-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.sensor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.sensor-title {
+  font-size: 1.2rem;
+  color: #444;
+  margin: 0;
+}
+
+.sensor-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #0066cc;
+}
+
+.sensor-timestamp {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 5px;
+}
+
+.chart-container {
+  height: 300px;
+  margin-top: 20px;
+}

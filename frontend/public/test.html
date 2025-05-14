@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IIoT Test Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .sensor-data {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f4f8;
+            border-radius: 4px;
+        }
+        #chart {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: white;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>IIoT Sensor Dashboard - Test Page</h1>
+        <div class="sensor-data">
+            <h2>Latest Sensor Reading:</h2>
+            <div id="sensorInfo">Loading...</div>
+        </div>
+        <div id="chart">
+            <canvas id="sensorChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Initialize chart
+        const ctx = document.getElementById('sensorChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Will be populated with timestamps
+                datasets: [{
+                    label: 'Sensor A Values',
+                    data: [], // Will be populated with values
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+
+        // Fetch data function
+        async function fetchSensorData() {
+            try {
+                const response = await fetch('http://localhost:8081/api/latest/sensorA');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Sensor data:', data);
+                
+                // Update sensor info display
+                const sensorInfo = document.getElementById('sensorInfo');
+                const timestamp = new Date(data.timestamp).toLocaleTimeString();
+                sensorInfo.innerHTML = `
+                    <p><strong>Sensor:</strong> ${data.sensorName}</p>
+                    <p><strong>Value:</strong> ${data.value}</p>
+                    <p><strong>Timestamp:</strong> ${timestamp}</p>
+                `;
+                
+                // Update chart
+                if (chart.data.labels.length >= 30) {
+                    chart.data.labels.shift();
+                    chart.data.datasets[0].data.shift();
+                }
+                chart.data.labels.push(timestamp);
+                chart.data.datasets[0].data.push(data.value);
+                chart.update();
+                
+            } catch (error) {
+                console.error('Error fetching sensor data:', error);
+                document.getElementById('sensorInfo').innerHTML = `
+                    <p style="color: red;">Error fetching data: ${error.message}</p>
+                    <p>Please check your backend connection.</p>
+                `;
+            }
+        }
+
+        // Initial fetch
+        fetchSensorData();
+        
+        // Update every 2 seconds
+        setInterval(fetchSensorData, 2000);
+    </script>
+</body>
+</html>
